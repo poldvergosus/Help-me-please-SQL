@@ -6,74 +6,123 @@
 Создать в БД роль Mobil и двух пользователей Abonent1и Abonent2, у которых пароли для входа в базу данных: Ab123 и Ab456.
 Поместить созданных пользователей в роль Mobil. Для роли определите права на чтение и изменение таблицы Abonent, права на работу с представлением View tel и на запуск процедуры Vvod tel. Пользователю Abonent1 определите разрешение на выполнение копии базы данных Telefon. используя системную процедуру, проверьте правильность выданных прав пользователям.
 В целях безопасности данных выполните копирование базы данных на созданное вами устройство резервного копирования. Выведите информацию на экран о созданной базе данных.
+
 CREATE DATABASE Telefon;
+
 GO
+
 CREATE DATABASE Telefon;
+
 GO
+
 USE Telefon;
 GO
+
 drop table Абонент
-CREATE TABLE Абонент (
+
+CREATE TABLE Абонент
+(
     Номер_абонента INT PRIMARY KEY,
+    
     Фамилия NVARCHAR(50) NOT NULL,
+    
     Имя NVARCHAR(50) NOT NULL,
+    
     Дата_оплаты DATE NOT NULL,
+    
     Абонентская_плата DECIMAL(10, 2) NOT NULL DEFAULT 600
+    
 );
+
 GO
+
 -- Создание процедуры для ввода данных
+
 Drop procedure Vvod_tel
+
 CREATE PROCEDURE Vvod_tel
+
     @Номер_абонента INT,
     @Фамилия NVARCHAR(50),
     @Имя NVARCHAR(50),
     @Дата_оплаты DATE,
     @Абонентская_плата DECIMAL(10, 2) = 600
+    
 AS
 BEGIN
+
     INSERT INTO Абонент (Номер_абонента, Фамилия, Имя, Дата_оплаты, Абонентская_плата)
     VALUES (@Номер_абонента, @Фамилия, @Имя, @Дата_оплаты, @Абонентская_плата);
+    
 END;
+
 GO
+
 -- Ввод 5 записей и проверка данных
 
 EXEC Vvod_tel 1, N'Иванов', N'Иван', '2024-09-01', 600;
+
 EXEC Vvod_tel 2, N'Петров', N'Петр', '2024-09-10', 650;
+
 EXEC Vvod_tel 3, N'Сидоров', N'Сидор', '2024-09-15', 600;
+
 EXEC Vvod_tel 4, N'Федоров', N'Федор', '2024-09-20', 700;
+
 EXEC Vvod_tel 5, N'Морозов', N'Мороз', '2024-09-25', 600;
 
 -- Проверка содержимого таблицы
+
 SELECT * FROM Абонент;
 GO
+
 --Создание представления
 CREATE VIEW View_tel AS
+
 SELECT COUNT(*) AS Общее_количество_абонентов FROM Абонент;
 GO
+
 -- Проверка представления
+
 SELECT * FROM View_tel;
 GO
+
 --Создание ролей и пользователей
 -- Создание роли Mobil
 CREATE ROLE Mobil;
 GO
+
 -- Создание пользователей
 CREATE LOGIN Abonent1 WITH PASSWORD = 'Ab123';
+
 CREATE LOGIN Abonent2 WITH PASSWORD = 'Ab456';
+
 CREATE USER Abonent1 FOR LOGIN Abonent1;
+
 CREATE USER Abonent2 FOR LOGIN Abonent2;
+
 -- Назначение пользователей в роль Mobil
+
 ALTER ROLE Mobil ADD MEMBER Abonent1;
+
 ALTER ROLE Mobil ADD MEMBER Abonent2;
+
 GO
 --Назначение прав
+
 -- Права для роли Mobil на таблицу Абонент
+
 GRANT SELECT, UPDATE ON Абонент TO Mobil;
+
 -- Права для роли Mobil на представление View_tel
+
 GRANT SELECT ON View_tel TO Mobil;
+
 -- Права для роли Mobil на выполнение процедуры Vvod_tel
+
 GRANT EXECUTE ON Vvod_tel TO Mobil;
+
 -- Дополнительные права для Abonent1 на выполнение резервного копирования
+
 GRANT BACKUP DATABASE TO Abonent1;
 GO
 -- Проверка прав
@@ -92,6 +141,7 @@ GO
 
 SHOP
 Создать базу данных Shop. используя оператор select, сделайте копию таблицы Order Details из бд northwind в бд Shop под именем ORDDetails1.
+
 Разработать процедуру Del_Shop для удаления новой таблицы ORDDetails1 те записи, у которых самая наименьшая и наибольшая цена.
 Разработать процедуру Upd_Shop, увеличивающую цену (поле UnitPrice) на 100 руб записям, у которых значение поля OrderID равно 10265
 Разработать преставление View_Shop, которое позволит получить информацию о записях, в которых значение поля OrderID равно 10250 и 10255
